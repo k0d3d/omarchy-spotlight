@@ -1,0 +1,52 @@
+The ranking code in Model.js (the "Ranking" section: normalize, transliterate,
+fuzzyMatch, passesThreshold, aliasMatch, searchTermMatch, buildRecord,
+comparePlain, compareMatched, rankCandidates) is adapted from omacast.
+
+  https://github.com/typecraft-dev/oma-cast
+
+omacast is MIT licensed:
+
+  MIT License
+
+  Copyright (c) 2026 typecraft and omacast contributors
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+
+omacast describes its own ranker as a clean-room port of Raycast's root-search
+algorithm and contains no Raycast code. Spotlight inherits that provenance.
+
+Local changes, so a future diff against upstream is legible:
+
+  * candidates are built from Spotlight rows by toCandidate();
+  * the optional flea-search branch (fleaRecord/fleaMatch/FLEA_*) is omitted —
+    the catalog here is a few hundred rows, so the in-process matcher is enough;
+  * contact/menu-bar/quicklink type priorities are kept but never produced;
+  * chords are searched only for chord-like queries (see buildRecord), instead
+    of every chord being a keyword on every query;
+  * keyword-match scores are compared, where upstream discards them;
+  * a title that starts with the query outranks a whole-word hit later in the
+    title, fixing "calc" ranking "LibreOffice Calc" above "Calculator";
+  * one- to three-letter queries match titles only and use a fixed score floor
+    (shortFloor), because a flat gap penalty makes long keyword strings match
+    almost anything at that length;
+  * the four- and five-letter threshold is stricter than upstream's curve, so
+    scattered title matches do not clear it;
+  * ties prefer the shorter title;
+  * natural collation is written out rather than delegated to
+    localeCompare({numeric: true}), which Qt is not guaranteed to honour.
