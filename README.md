@@ -25,7 +25,7 @@ storage and capture layer.
 └──────────────────────────────────────────────────────────┘
 ```
 
-Version `0.6.0`, manifest schema 1. Phase 0 (usage capture, live shortcut
+Version `0.6.1`, manifest schema 1. Phase 0 (usage capture, live shortcut
 catalog, Raycast-style ranking, executable actions and shortcuts, window
 focusing and a file lens) is live.
 

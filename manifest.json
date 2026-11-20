@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "k0d3d.spotlight",
   "name": "Spotlight",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": "k0d3d",
   "description": "First-principles command center: ranked apps, Omarchy actions, shortcuts and files in one surface, with a shared usage bridge",
   "kinds": [

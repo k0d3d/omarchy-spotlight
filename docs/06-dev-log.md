@@ -891,6 +891,34 @@ Enter → active window class io.github.tsouth89.omaroll
 Paths are not recorded as usage. Recording them would turn the event log into a
 document history, which is a different privacy promise.
 
+### Enter never left the workspace (0.6.1)
+
+A window-focused Enter looked right on the current workspace and did nothing at
+all on another one. The trace said the branch was right — `launch` was
+recorded, no duplicate was started — so the failure was in the dispatch.
+
+`Hyprland.toplevels.values[i].address` from Quickshell is the bare address
+(`55f37583a100`); Hyprland's dispatchers want `address:0x55f37583a100`. Every
+dispatch was therefore answering `hl.focus: window not found`, with stdout and
+stderr sent to `/dev/null`, and the retry loop burned its ten attempts in half a
+second. The same-workspace case felt fine only because the window was already
+in front of the user when it failed.
+
+The dock already knew this: `Dock.qml` prefixes `0x` when it is missing.
+`windowsFor()` now normalizes the address when it builds a row, `bringForward()`
+normalizes again before use, and the quiet retry loop can no longer hide the
+reason. Verified with `foot` living on workspace 20:
+
+```text
+foot on ws 20, focus elsewhere → Enter → ws 20 active, foot focused
+foot on active ws             → Enter → focus stays on foot
+foot minimized                → Enter → moved back to the active ws, focused
+```
+
+Reproducing it took an instrumented copy of the focus script: the layer-grep
+loop, the focus retry and `hyprctl activewindow` were all fine, which narrowed
+the problem to the argument rather than the timing.
+
 ### The actions lens was seven hand-written rows
 
 A fair question after 0.5.0: Lock screen, Theme menu, Night light — why were

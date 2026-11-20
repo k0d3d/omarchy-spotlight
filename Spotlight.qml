@@ -389,8 +389,12 @@ Item {
       if (!wayland || !wayland.appId || wayland.parent) continue
       var entry = root.entryForAppId(wayland.appId)
       if (!entry || String(entry.id) !== wanted) continue
+      // Quickshell hands out the address without the `0x` Hyprland's
+      // dispatchers expect; `address:55f…` is not a window.
+      var address = String(top.address || "")
+      if (address && address.indexOf("0x") !== 0) address = "0x" + address
       out.push({
-        address: String(top.address || ""),
+        address: address,
         focused: !!wayland.activated,
         onActive: !!(top.workspace && top.workspace.id === active),
         minimized: !!(top.workspace && top.workspace.name === "special:minimized"),
@@ -413,7 +417,9 @@ Item {
   // retry. This mirrors what omarchy's dock does for its window buttons.
   function bringForward(win) {
     if (!win) return
-    if (!win.address) {
+    var address = String(win.address || "")
+    if (address && address.indexOf("0x") !== 0) address = "0x" + address
+    if (!address) {
       if (win.toplevel && win.toplevel.activate) win.toplevel.activate()
       return
     }
@@ -437,7 +443,7 @@ Item {
       "  sleep 0.05",
       "done"
     ].join("\n")
-    Quickshell.execDetached(["bash", "-c", script, "spotlight-focus", win.address, win.minimized ? "1" : "0"])
+    Quickshell.execDetached(["bash", "-c", script, "spotlight-focus", address, win.minimized ? "1" : "0"])
   }
 
   // Enter on an app: focus its window if it has one, launch otherwise.

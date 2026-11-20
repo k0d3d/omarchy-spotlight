@@ -579,6 +579,12 @@ moved back to the active workspace first with `no_anim` set, so it reappears
 without a slide-in. If the window never takes focus, the script exits and
 nothing is launched — the user still has the window.
 
+One detail matters for windows on other workspaces: Quickshell's
+`HyprlandToplevel.address` is the bare address (`55f37583a100`), while
+Hyprland's dispatchers want the `0x` form. `windowsFor()` normalizes it before
+building a row, and `bringForward()` normalizes again defensively; without that,
+`address:55f…` is "window not found" and the focus silently does nothing.
+
 This is the omacast `AppFocuser` idea, but expressed with the shell's own
 `Hyprland` service instead of parsing `hyprctl clients` JSON.
 
